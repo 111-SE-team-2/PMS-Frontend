@@ -17,13 +17,32 @@
                 label="Select repository type"
                 :items="['Github', 'Gitlab', 'Sonarqube', 'Jira']"
                 v-model="repoType"
-                v-show="isShow()"
+                v-show="isProject() && isSchedule()"
               ></v-select>
             </v-col>
           </v-row>
         </v-container>
         <!-- add project form-->
-        <v-container v-show="!isShow()">
+        <v-container v-show="!isProject()">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                :label="vTextLabel"
+                v-model="url"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Cancel
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="add"> Add </v-btn>
+          </v-row>
+        </v-container>
+        <!-- add schedule form-->
+        <v-container v-show="!isSchedule()">
           <v-row>
             <v-col cols="12">
               <v-text-field
@@ -241,8 +260,11 @@ export default Vue.extend({
       this.jiraData.boardList = [];
       this.jiraVerifyState = false;
     },
-    isShow() {
+    isProject() {
       return !this.vCardTitle.includes("Project");
+    },
+    isSchedule() {
+      return !this.vCardTitle.includes("Schedule");
     },
     async verifyAndGetBoardInfo() { 
       const result = await getJiraBoardInfo(

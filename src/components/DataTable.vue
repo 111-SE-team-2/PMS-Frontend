@@ -44,7 +44,7 @@
             </v-row>
             <v-row>
               <v-col>
-                <div @click="goToRepositoryDetail(item.id, item.name)">
+                <div @click="goToProjectInfoDetail(item.id, item.name)">
                   <a class="subheading font-weight-bold text-h4">
                     {{ item.name }}
                   </a>
@@ -85,8 +85,8 @@ export default Vue.extend({
     };
   },
   methods: {
-    goToRepositoryDetail(id: string, projectName: string) {
-      this.$router.push({ name: "Repository", params: { projectId: id } });
+    goToProjectInfoDetail(id: string, projectName: string) {
+      this.$router.push({ name: "ProjectInfo", params: { projectId: id } });
     },
 
     isDeleteProjectEnable(userId: string, owner: string) {

@@ -3,6 +3,7 @@ import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
 import Login from "@/views/Login.vue";
 import AdminLogin from "@/views/AdminLogin.vue";
 import Project from "@/views/Project.vue";
+import ProjectInfo from "@/views/ProjectInfo.vue";
 import Repository from "@/views/Repository.vue";
 import GithubAuthorize from "@/components/GithubAuthorize.vue";
 import RepoInfo from "@/views/RepoInfo.vue";
@@ -48,11 +49,17 @@ const routes: Array<RouteConfig> = [
     beforeEnter: (to, from, next) => checkAuth(true, "Login", next)
   },
   {
-    path: "/project/:projectId",
-    name: "Repository",
-    component: Repository,
+    path: "/projectInfo/:projectId",
+    name: "ProjectInfo",
+    component: ProjectInfo,
     beforeEnter: (to, from, next) => checkAuth(true, "Login", next)
   },
+  // {
+  //   path: "/project/:projectId",
+  //   name: "Repository",
+  //   component: Repository,
+  //   beforeEnter: (to, from, next) => checkAuth(true, "Login", next)
+  // },
   {
     path: "/project/:projectId/repoinfo/:repoId",
     name: "RepoInfo",

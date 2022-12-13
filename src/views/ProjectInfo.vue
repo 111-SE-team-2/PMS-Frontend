@@ -43,7 +43,7 @@
       <v-tab-item
         ><Repository/></v-tab-item>
       <v-tab-item
-        ><Repository/></v-tab-item>
+        ><Schedule/></v-tab-item>
       <v-tab-item
         ><Repository/></v-tab-item>
       <v-tab-item></v-tab-item>
@@ -54,7 +54,7 @@
 <script lang="ts">
   import Vue from "vue";
   import Repository from "@/views/Repository.vue"
-  import Schudule from "@/views/Schedule.vue"
+  import Schedule from "@/views/Schedule.vue"
   import { editProject, getProject, getProjectMember } from "@/apis/projects";
   import { getUserInfo, isCurrentUserProjectOwner } from "@/apis/user";
   import UserInfo from "@/components/UserInfo.vue";
@@ -65,7 +65,7 @@
   export default Vue.extend({
     components: {
         Repository,
-        // Schudule,
+        Schedule,
         InviteUser,
         ProjectMemberTable,
     },

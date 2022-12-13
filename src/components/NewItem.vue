@@ -47,9 +47,24 @@
             <v-col cols="12">
               <v-text-field
                 :label="vTextLabel"
-                v-model="url"
+                v-model="title"
                 required
               ></v-text-field>
+              <v-text-field
+                label="location"
+                v-model="location"
+                required
+              ></v-text-field>
+              <v-text-field
+                label="description"
+                v-model="description"
+                required
+              ></v-text-field>
+              <v-switch
+                label="isVideoConferencing"
+                v-model="isVideoConferencing"
+                required
+              ></v-switch>
             </v-col>
           </v-row>
           <v-row>
@@ -57,7 +72,7 @@
             <v-btn color="blue darken-1" text @click="dialog = false">
               Cancel
             </v-btn>
-            <v-btn color="blue darken-1" text @click="add"> Add </v-btn>
+            <v-btn color="blue darken-1" text @click="addSchedule"> Add </v-btn>
           </v-row>
         </v-container>
         <!-- github form -->
@@ -221,7 +236,11 @@ export default Vue.extend({
       userAccounts: [] as any,
       repoType: "",
       jiraVerifyState: false,
-      projectId: this.$route.params.projectId
+      projectId: this.$route.params.projectId,
+      title: "",
+      location: "",
+      description: "",
+      isVideoConferencing: false
     };
   },
   watch: {
@@ -259,6 +278,10 @@ export default Vue.extend({
       this.jiraData.URL = "";
       this.jiraData.boardList = [];
       this.jiraVerifyState = false;
+      this.title = "";
+      this.location = "";
+      this.description = "";
+      this.isVideoConferencing = false;
     },
     isProject() {
       return !this.vCardTitle.includes("Project");
@@ -294,6 +317,16 @@ export default Vue.extend({
       this.$emit(
         "showSnackBar",
         result.data.success
+      );
+      this.dialog = false;
+    },
+    addSchedule(){
+      this.$emit(
+        "add",
+        this.title,
+        this.location,
+        this.description,
+        this.isVideoConferencing
       );
       this.dialog = false;
     }

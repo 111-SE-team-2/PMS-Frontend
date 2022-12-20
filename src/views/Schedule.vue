@@ -80,7 +80,7 @@ import Vue from "vue";
 import router from "@/router";
 import NewItem from "@/components/NewItem.vue";
 import TableSearch from "@/components/TableSearch.vue";
-import { createSchedule, deleteSchedule, getSchedule } from "@/apis/schedule";
+import { createSchedule, deleteSchedule, getSchedulesInProject } from "@/apis/schedule";
 
 export default Vue.extend({
   components: {
@@ -112,11 +112,11 @@ export default Vue.extend({
     };
   },
   async created() {
-    this.schedules = (await getSchedule(this.projectId))["data"];
+    this.schedules = (await getSchedulesInProject(this.projectId))["data"];
   },
   methods: {
     async goToScheduleInfo(id: any) {
-      // this.$router.push({ name: "ScheduleInfo", params: { repoId: id } });
+      this.$router.push({ name: "ScheduleInfo", params: { scheduleId: id } });
     },
     async add(
       title: any,
@@ -145,7 +145,7 @@ export default Vue.extend({
       await this.getSchedules();
     },
     async getSchedules() {
-      this.schedules = (await getSchedule(this.projectId))["data"];
+      this.schedules = (await getSchedulesInProject(this.projectId))["data"];
     },
     ChangeInput(searchedSchedule: any) {
       this.search = searchedSchedule;

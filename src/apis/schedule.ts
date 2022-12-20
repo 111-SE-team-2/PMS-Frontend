@@ -2,8 +2,8 @@ import axios from "axios";
 import { host } from "@/config/config";
 import store from "@/store";
 
-export const getSchedule = (projectId: string) => {
-  return axios.get(`${host}/schedule/${projectId}`, {
+export const getSchedulesInProject: any = (projectId: string) => {
+  return axios.get(`${host}/schedule/project/${projectId}`, {
     headers: {
       Authorization: `Bearer ${store.auth.getToken}`
     }
@@ -12,7 +12,7 @@ export const getSchedule = (projectId: string) => {
 
 export const createSchedule: any = (
   projectId: number,
-  title: string,
+  name: string,
   location: string,
   description: string,
   isVideoConferencing: boolean
@@ -21,7 +21,7 @@ export const createSchedule: any = (
     `${host}/schedule/create`,
     {
       projectId: projectId,
-      title: title,
+      name: name,
       location: location,
       description: description,
       isVideoConferencing: isVideoConferencing
@@ -36,6 +36,46 @@ export const createSchedule: any = (
 
 export const deleteSchedule: any = (scheduleId: number) => {
   return axios.delete(`${host}/schedule/${scheduleId}`, {
+    headers: {
+      Authorization: `Bearer ${store.auth.getToken}`
+    }
+  });
+};
+
+export const getSchedule: any = (scheduleId: string) => {
+  return axios.get(`${host}/schedule/${scheduleId}`, {
+    headers: {
+      Authorization: `Bearer ${store.auth.getToken}`
+    }
+  });
+};
+
+export const editSchedule: any = (
+  scheduleId: number,
+  name: string,
+  location: string,
+  description: string,
+  isVideoConferencing: boolean
+) => {
+  return axios.put(
+    `${host}/schedule/edit`,
+    {
+      scheduleId: scheduleId,
+      name: name,
+      location: location,
+      description: description,
+      isVideoConferencing: isVideoConferencing
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${store.auth.getToken}`
+      }
+    }
+  );
+};
+
+export const getScheduleOptions: any = (scheduleId: string) => {
+  return axios.get(`${host}/scheduleOption/${scheduleId}`, {
     headers: {
       Authorization: `Bearer ${store.auth.getToken}`
     }

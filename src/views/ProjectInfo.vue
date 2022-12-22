@@ -40,13 +40,13 @@
       </v-tabs>
 
       <v-tabs-items v-model="tab" class="tab-item">
-      <v-tab-item
-        ><Repository/></v-tab-item>
-      <v-tab-item
-        ><Schedule/></v-tab-item>
-      <v-tab-item
-        ><Repository/></v-tab-item>
-      <v-tab-item></v-tab-item>
+        <v-tab-item
+          ><Repository/></v-tab-item>
+        <v-tab-item
+          ><Schedule/></v-tab-item>
+        <v-tab-item
+          ><Repository/></v-tab-item>
+        <v-tab-item></v-tab-item>
       </v-tabs-items>
   </v-container>
 </template>

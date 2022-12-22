@@ -49,10 +49,10 @@
                   </v-card>
                 </v-dialog>
               </template>
-              <template v-slot:[`item.name`]="{ item }">
+              <template v-slot:[`item.title`]="{ item }">
                 <img src="../assets/schedule.png">
                 <a class="py-2 " @click="goToScheduleInfo(item.id)">
-                  {{ item.name }}
+                  {{ item.title }}
                 </a>
               </template>
               <template v-slot:[`item.action`]="{ item }">
@@ -93,14 +93,14 @@ export default Vue.extend({
       headers: [
         {
           text: "ScheduleTitle",
-          value: "name",
+          value: "title",
         },
         {
           text: "action",
           value: "action",
         },
       ],
-      schedules: [{ type: Object, id: "", name: "", test: "" }],
+      schedules: [{ type: Object, id: "", title: "", test: "" }],
       dialog: false,
       projectId: this.$route.params.projectId,
       msg: "",

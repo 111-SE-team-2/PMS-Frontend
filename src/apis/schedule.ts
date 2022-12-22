@@ -12,7 +12,7 @@ export const getSchedulesInProject: any = (projectId: string) => {
 
 export const createSchedule: any = (
   projectId: number,
-  name: string,
+  title: string,
   location: string,
   description: string,
   isVideoConferencing: boolean
@@ -21,7 +21,7 @@ export const createSchedule: any = (
     `${host}/schedule/create`,
     {
       projectId: projectId,
-      name: name,
+      title: title,
       location: location,
       description: description,
       isVideoConferencing: isVideoConferencing
@@ -52,7 +52,7 @@ export const getSchedule: any = (scheduleId: string) => {
 
 export const editSchedule: any = (
   scheduleId: number,
-  name: string,
+  title: string,
   location: string,
   description: string,
   isVideoConferencing: boolean
@@ -61,7 +61,7 @@ export const editSchedule: any = (
     `${host}/schedule/edit`,
     {
       scheduleId: scheduleId,
-      name: name,
+      title: title,
       location: location,
       description: description,
       isVideoConferencing: isVideoConferencing
@@ -76,6 +76,42 @@ export const editSchedule: any = (
 
 export const getScheduleOptions: any = (scheduleId: string) => {
   return axios.get(`${host}/scheduleOption/${scheduleId}`, {
+    headers: {
+      Authorization: `Bearer ${store.auth.getToken}`
+    }
+  });
+};
+
+export const addScheduleOption: any = (
+  scheduleId: number,
+  startTime: string,
+  duration: string,
+) => {
+  return axios.post(
+    `${host}/scheduleOption/add`,
+    {
+      scheduleId: scheduleId,
+      startTime: startTime,
+      duration: duration,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${store.auth.getToken}`
+      }
+    }
+  );
+};
+
+export const deleteScheduleOption: any = (scheduleOptionId: number) => {
+  return axios.delete(`${host}/scheduleOption/${scheduleOptionId}`, {
+    headers: {
+      Authorization: `Bearer ${store.auth.getToken}`
+    }
+  });
+};
+
+export const getUserListInScheduleOption: any = (scheduleOptionId: string) => {
+  return axios.get(`${host}/userScheduleOption/${scheduleOptionId}`, {
     headers: {
       Authorization: `Bearer ${store.auth.getToken}`
     }

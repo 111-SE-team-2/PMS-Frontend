@@ -42,7 +42,7 @@
           </v-row>
         </v-container>
         <!-- add schedule form-->
-        <v-container v-show="!isSchedule()">
+        <v-container v-show="!isSchedule() && isScheduleOption()">
           <v-row>
             <v-col cols="12">
               <v-text-field
@@ -73,6 +73,30 @@
               Cancel
             </v-btn>
             <v-btn color="blue darken-1" text @click="addSchedule"> Add </v-btn>
+          </v-row>
+        </v-container>
+        <!-- add schedule option form-->
+        <v-container v-show="!isScheduleOption()">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                :label="vTextLabel"
+                v-model="startTime"
+                required
+              ></v-text-field>
+              <v-text-field
+                label="duration"
+                v-model="duration"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Cancel
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="addScheduleOption"> Add </v-btn>
           </v-row>
         </v-container>
         <!-- github form -->
@@ -240,7 +264,9 @@ export default Vue.extend({
       title: "",
       location: "",
       description: "",
-      isVideoConferencing: false
+      isVideoConferencing: false,
+      startTime: "",
+      duration: ""
     };
   },
   watch: {
@@ -282,12 +308,17 @@ export default Vue.extend({
       this.location = "";
       this.description = "";
       this.isVideoConferencing = false;
+      this.startTime = "";
+      this.duration = "";
     },
     isProject() {
       return !this.vCardTitle.includes("Project");
     },
     isSchedule() {
       return !this.vCardTitle.includes("Schedule");
+    },
+    isScheduleOption() {
+      return !this.vCardTitle.includes("Schedule Option");
     },
     async verifyAndGetBoardInfo() { 
       const result = await getJiraBoardInfo(
@@ -327,6 +358,14 @@ export default Vue.extend({
         this.location,
         this.description,
         this.isVideoConferencing
+      );
+      this.dialog = false;
+    },
+    addScheduleOption(){
+      this.$emit(
+        "add",
+        this.startTime,
+        this.duration
       );
       this.dialog = false;
     }

@@ -102,7 +102,7 @@ export const addScheduleOption: any = (
   );
 };
 
-export const deleteScheduleOption: any = (scheduleOptionId: number) => {
+export const deleteScheduleOption: any = (scheduleOptionId: string) => {
   return axios.delete(`${host}/scheduleOption/${scheduleOptionId}`, {
     headers: {
       Authorization: `Bearer ${store.auth.getToken}`
@@ -110,8 +110,26 @@ export const deleteScheduleOption: any = (scheduleOptionId: number) => {
   });
 };
 
+export const voteScheduleOption: any = (
+  scheduleOptionId: number,
+  availability: string
+) => {
+  return axios.post(
+    `${host}/userScheduleOption/vote`,
+    {
+      scheduleOptionId: scheduleOptionId,
+      availability: availability,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${store.auth.getToken}`
+      }
+    }
+  );
+};
+
 export const getUserListInScheduleOption: any = (scheduleOptionId: string) => {
-  return axios.get(`${host}/userScheduleOption/${scheduleOptionId}`, {
+  return axios.get(`${host}/userScheduleOption/${scheduleOptionId}/list`, {
     headers: {
       Authorization: `Bearer ${store.auth.getToken}`
     }

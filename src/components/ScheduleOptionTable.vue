@@ -1,5 +1,5 @@
 <template>
-	<v-container fluid style="height: 100%" class="container-background-color">
+	<v-container fluid class="container-background-color">
 	  <v-row class="d-flex justify-center">
       <v-col>
         <v-data-table
@@ -37,11 +37,52 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
+            <v-dialog v-model="dialogVote" max-width="30%">
+              <v-card>
+                <v-card-title class="headline"
+                  >Please select your availability</v-card-title
+                >
+                <v-card-subtitle>This is your availability now: 
+                  <v-chip
+                    class="py-3 my-4 status"
+                    :color="getColor(availabilityMap.get(wantToVoteScheduleOptionId))"
+                    label
+                    x-small
+                    dark
+                  >{{ availabilityMap.get(wantToVoteScheduleOptionId) }}</v-chip>
+                </v-card-subtitle>
+                <v-card-text>
+                  <v-select
+                  label="Select availability"
+                  :items="['Yes', 'If Need Be', 'Cannot Attend', 'Pending']"
+                  v-model="availabilitySelection"
+                ></v-select>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue darken-1" text @click="voteCancel()"
+                    >Cancel</v-btn
+                  >
+                  <v-btn color="blue darken-1" text @click="voteConfirm()"
+                    >OK</v-btn
+                  >
+                  <v-spacer></v-spacer>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </template>
           <template v-slot:[`item.action`]="{ item }">
-            <div class="d-flex justify-end align-end">
-              <v-icon @click="deleteScheduleOption(item.scheduleOptionId)"> mdi-delete </v-icon>
-            </div>
+            <v-icon @click="deleteScheduleOption(item.id)"> mdi-delete </v-icon>
+          </template>
+          <template v-slot:[`item.id`]="{ item }">
+            <v-chip
+              class="py-3 my-4 status"
+              :color="getColor(availabilityMap.get(item.id))"
+              label
+              x-small
+              dark
+              @click="voteScheduleOption(item.id)"
+            >{{ availabilityMap.get(item.id) }}</v-chip>
           </template>
         </v-data-table>
 			</v-col>
@@ -49,9 +90,7 @@
         v-model="snackBar"
         :timeout="snackBarTimeout"
         :color="snackBarColor"
-      >
-        {{ msg }}
-      </v-snackbar>
+      >{{ msg }}</v-snackbar>
 		</v-row>
 	</v-container>
 </template>
@@ -59,8 +98,8 @@
 <script lang="ts">
 	import Vue from "vue";
   import NewItem from "@/components/NewItem.vue";
-	import { addScheduleOption, deleteScheduleOption, getScheduleOptions, getUserListInScheduleOption } from "@/apis/schedule";
-import { VContainer, VRow, VCol, VDataTable, VDivider, VDialog, VCard, VCardTitle, VCardActions, VSpacer, VBtn, VIcon, VSnackbar } from "vuetify/lib";
+	import { addScheduleOption, deleteScheduleOption, getScheduleOptions, voteScheduleOption } from "@/apis/schedule";
+import { getUserInfo } from "@/apis/user";
 
 	export default Vue.extend({
 		components: {
@@ -68,9 +107,9 @@ import { VContainer, VRow, VCol, VDataTable, VDivider, VDialog, VCard, VCardTitl
 		},
 		data() {
 			return {
+        
 				scheduleId: Number(this.$route.params.scheduleId),
-				scheduleOptions: [],
-				userScheduleOptions: [],
+				scheduleOptions: [{ type: Object, id: "", users: [{type: Object, account: "", availability: ""}]}],
 				msg: "",
 				dialog: false,
 				snackBar: false,
@@ -80,22 +119,44 @@ import { VContainer, VRow, VCol, VDataTable, VDivider, VDialog, VCard, VCardTitl
 					{text: "StartTime", value: "startTime"},
 			    {text: "Duration", value: "duration"},
 					{text: "Yes", value: "numberOfYes"},
-					{text: "IfNeedBe", value: "numberOfIfNeedBe"},
-					{text: "CannotAttend", value: "numberOfCannotAttend"},
+					{text: "If Need Be", value: "numberOfIfNeedBe"},
+					{text: "Cannot Attend", value: "numberOfCannotAttend"},
 					{text: "Pending", value: "numberOfPending"},
-					{text: "MySelection", value: ""},
-          {text: "action", value: "action"},
+					{text: "My Availability", value: "id"},
+          {text: "Action", value: "action"},
 				],
         dialogDelete: false,
         wantToDeleteScheduleOptionId: -1,
+        availabilityMap: new Map(),
+        user: { type: Object, id: "" },
+        dialogVote: false,
+        wantToVoteScheduleOptionId: -1,
+        availabilitySelection: "Unselect"
 			};
 		},
 		async created() {
+      this.user = (await getUserInfo())["data"];
 			this.scheduleOptions = (await getScheduleOptions(this.scheduleId))["data"];
+      this.scheduleOptions.forEach((value) => {
+        this.availabilityMap.set(value.id, "Unselect");
+        value.users.forEach((user) => {
+          if (user.account === this.user.id) {
+            this.availabilityMap.set(value.id, user.availability);
+          }
+        })
+      });
 		},
 		methods: {
       async getScheduleOptions() {
         this.scheduleOptions = (await getScheduleOptions(this.scheduleId))["data"];
+        this.scheduleOptions.forEach((value) => {
+          this.availabilityMap.set(value.id, "Unselect");
+          value.users.forEach((user) => {
+            if (user.account === this.user.id) {
+              this.availabilityMap.set(value.id, user.availability);
+            }
+          })
+        });
       },
       async add(
         startTime: string,
@@ -110,13 +171,6 @@ import { VContainer, VRow, VCol, VDataTable, VDivider, VDialog, VCard, VCardTitl
         this.dialog = false;
         this.snackBar = true;
         this.snackBarColor = result["data"].success ? "green" : "red";
-        await this.getScheduleOptions();
-      },
-      async showSnackBar(success: boolean ) {
-        this.msg = success ? "Add success!" : "Add fail!";
-        //this.dialog = false;
-        this.snackBar = true;
-        this.snackBarColor = success ? "green" : "red";
         await this.getScheduleOptions();
       },
       deleteScheduleOption(scheduleOptionId: any) {
@@ -135,6 +189,40 @@ import { VContainer, VRow, VCol, VDataTable, VDivider, VDialog, VCard, VCardTitl
       deleteCancel() {
         this.dialogDelete = false;
         this.wantToDeleteScheduleOptionId = -1;
+      },
+      voteScheduleOption(scheduleOptionId: any) {
+        this.dialogVote = true;
+        this.wantToVoteScheduleOptionId = scheduleOptionId;
+        this.availabilitySelection = this.availabilityMap.get(scheduleOptionId);
+      },
+      async voteConfirm() {
+        const result = await voteScheduleOption(this.wantToVoteScheduleOptionId, this.availabilitySelection);
+        this.dialogVote = false;
+        this.wantToVoteScheduleOptionId = -1;
+        this.availabilitySelection = "Unselect";
+        this.msg = result["data"].message;
+        this.snackBar = true;
+        this.snackBarColor = result["data"].success ? "green" : "red";
+        await this.getScheduleOptions();
+      },
+      voteCancel() {
+        this.dialogVote = false;
+        this.wantToVoteScheduleOptionId = -1;
+        this.availabilitySelection = "Unselect";
+      },
+      getColor(type: string) {
+        if (type === "Yes") return "green";
+        else if (type === "If Need Be") return "orange";
+        else if (type === "Cannot Attend") return "red";
+        else if (type === "Pending") return "gray";
+        else return "black";
+      },
+      async showSnackBar(success: boolean ) {
+        this.msg = success ? "Add success!" : "Add fail!";
+        //this.dialog = false;
+        this.snackBar = true;
+        this.snackBarColor = success ? "green" : "red";
+        await this.getScheduleOptions();
       },
 		}
 	});

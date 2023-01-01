@@ -35,8 +35,8 @@
     </v-row>
       <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
         <v-tab>Repository</v-tab>
-        <v-tab>Schedule</v-tab>
-        <v-tab>MeetingMinute</v-tab>
+        <v-tab>Schedule Survey</v-tab>
+        <v-tab>Meeting Minute</v-tab>
       </v-tabs>
 
       <v-tabs-items v-model="tab" class="tab-item">
@@ -45,7 +45,7 @@
         <v-tab-item
           ><Schedule/></v-tab-item>
         <v-tab-item
-          ><Repository/></v-tab-item>
+          ><MeetingMinute/></v-tab-item>
         <v-tab-item></v-tab-item>
       </v-tabs-items>
   </v-container>
@@ -61,14 +61,16 @@
   import InviteUser from "@/components/InviteUser.vue";
   import ProjectMemberTable from "@/components/ProjectMemberTable.vue";
   import { invite, sendInvitation } from "@/apis/notification";
+import MeetingMinute from "./MeetingMinute.vue";
   
   export default Vue.extend({
     components: {
-        Repository,
-        Schedule,
-        InviteUser,
-        ProjectMemberTable,
-    },
+    Repository,
+    Schedule,
+    MeetingMinute,
+    InviteUser,
+    ProjectMemberTable
+},
     data() {
       return {
         tab: null,

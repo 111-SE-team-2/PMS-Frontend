@@ -17,7 +17,7 @@
                 label="Select repository type"
                 :items="['Github', 'Gitlab', 'Sonarqube', 'Jira']"
                 v-model="repoType"
-                v-show="isProject() && isSchedule()"
+                v-show="isProject() && isSchedule() && isMeetingMinute()"
               ></v-select>
             </v-col>
           </v-row>
@@ -97,6 +97,25 @@
               Cancel
             </v-btn>
             <v-btn color="blue darken-1" text @click="addScheduleOption"> Add </v-btn>
+          </v-row>
+        </v-container>
+        <!-- add meeting minute form-->
+        <v-container v-show="!isMeetingMinute()">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                :label="vTextLabel"
+                v-model="title"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Cancel
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="addMeetingMinute"> Add </v-btn>
           </v-row>
         </v-container>
         <!-- github form -->
@@ -320,6 +339,9 @@ export default Vue.extend({
     isScheduleOption() {
       return !this.vCardTitle.includes("Schedule Option");
     },
+    isMeetingMinute() {
+      return !this.vCardTitle.includes("Meeting Minute");
+    },
     async verifyAndGetBoardInfo() { 
       const result = await getJiraBoardInfo(
         this.jiraData.URL,
@@ -366,6 +388,13 @@ export default Vue.extend({
         "add",
         this.startTime,
         this.duration
+      );
+      this.dialog = false;
+    },
+    addMeetingMinute(){
+      this.$emit(
+        "add",
+        this.title
       );
       this.dialog = false;
     }

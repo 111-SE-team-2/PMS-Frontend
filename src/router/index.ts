@@ -3,10 +3,13 @@ import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
 import Login from "@/views/Login.vue";
 import AdminLogin from "@/views/AdminLogin.vue";
 import Project from "@/views/Project.vue";
+import ProjectInfo from "@/views/ProjectInfo.vue";
 import Repository from "@/views/Repository.vue";
 import GithubAuthorize from "@/components/GithubAuthorize.vue";
 import RepoInfo from "@/views/RepoInfo.vue";
 import JiraInfo from "@/views/JiraInfo.vue";
+import ScheduleInfo from "@/views/ScheduleInfo.vue";
+import MeetingMinuteInfo from "@/views/MeetingMinuteInfo.vue";
 import NotFound from "@/views/NotFound.vue";
 import store from "@/store";
 import Manage from "@/views/Manage.vue";
@@ -49,20 +52,32 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/project/:projectId",
-    name: "Repository",
-    component: Repository,
+    name: "ProjectInfo",
+    component: ProjectInfo,
     beforeEnter: (to, from, next) => checkAuth(true, "Login", next)
   },
   {
-    path: "/project/:projectId/repoinfo/:repoId",
+    path: "/project/:projectId/repo/:repoId",
     name: "RepoInfo",
     component: RepoInfo,
     beforeEnter: (to, from, next) => checkAuth(true, "Login", next)
   },
   {
-    path: "/project/:projectId/jirainfo/:repoId",
+    path: "/project/:projectId/jira/:repoId",
     name: "JiraInfo",
     component: JiraInfo,
+    beforeEnter: (to, from, next) => checkAuth(true, "Login", next)
+  },
+  {
+    path: "/project/:projectId/schedule/:scheduleId",
+    name: "ScheduleInfo",
+    component: ScheduleInfo,
+    beforeEnter: (to, from, next) => checkAuth(true, "Login", next)
+  },
+  {
+    path: "/project/:projectId/meetingMinute/:meetingMinuteId",
+    name: "MeetingMinuteInfo",
+    component: MeetingMinuteInfo,
     beforeEnter: (to, from, next) => checkAuth(true, "Login", next)
   },
   {

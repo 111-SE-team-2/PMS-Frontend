@@ -7,7 +7,7 @@
           <v-col>
             <v-data-table
               :headers="headers"
-              :items="repositories"
+              :items="schedules"
               :search="search"
               fixed-header
               hide-default-footer
@@ -17,14 +17,14 @@
                 <v-row class="d-flex justify-space-around">
                   <v-col class="pl-5">
                     <TableSearch
-                      vTextLabel="Find a Repo..."
+                      vTextLabel="Find a Schedule..."
                       @ChangeInput="ChangeInput($event)"
                     />
                   </v-col>
                   <v-col class="d-flex justify-end align-end pr-5">
                     <NewItem
-                      vCardTitle="Add Repository"
-                      vTextLabel="Repository URL"
+                      vCardTitle="Add Schedule"
+                      vTextLabel="Schedule Title"
                       @add="add"
                       @showSnackBar="showSnackBar"
                     />
@@ -49,15 +49,15 @@
                   </v-card>
                 </v-dialog>
               </template>
-              <template v-slot:[`item.name`]="{ item }">
-                <img src="../assets/GitHub-Mark-32px.png">
-                <a class="py-2 " @click="goToRepoInfo(item.id, item.type)">
-                  {{ item.name }}
+              <template v-slot:[`item.title`]="{ item }">
+                <img src="../assets/schedule.png">
+                <a class="py-2 " @click="goToScheduleInfo(item.id)">
+                  {{ item.title }}
                 </a>
               </template>
               <template v-slot:[`item.action`]="{ item }">
                 <div class="d-flex justify-end align-end">
-                  <v-icon @click="deleteRepo(item.id)"> mdi-delete </v-icon>
+                  <v-icon @click="deleteSchedule(item.id)"> mdi-delete </v-icon>
                 </div>
               </template>
             </v-data-table>
@@ -78,9 +78,9 @@
 <script lang="ts">
 import Vue from "vue";
 import router from "@/router";
-import { addRepo, getRepository, deleteRepo } from "@/apis/repository";
 import NewItem from "@/components/NewItem.vue";
 import TableSearch from "@/components/TableSearch.vue";
+import { createSchedule, deleteSchedule, getSchedulesInProject } from "@/apis/schedule";
 
 export default Vue.extend({
   components: {
@@ -92,90 +92,83 @@ export default Vue.extend({
       search: "",
       headers: [
         {
-          text: "RepositoryName",
-          value: "name",
+          text: "ScheduleTitle",
+          value: "title",
         },
         {
           text: "action",
           value: "action",
         },
       ],
-      repositories: [{ type: Object, id: "", name: "", test: "" }],
+      schedules: [{ type: Object, id: "", title: "", test: "" }],
       dialog: false,
       projectId: this.$route.params.projectId,
-      url: "",
       msg: "",
       snackBar: false,
       snackBarTimeout: 5000,
       snackBarColor: "",
       dialogDelete: false,
-      wantToDeleteRepoId: -1,
+      wantToDeleteScheduleId: -1,
     };
   },
   async created() {
-    this.repositories = (await getRepository(this.projectId))["data"];
+    this.schedules = (await getSchedulesInProject(this.projectId))["data"];
   },
   methods: {
-    async goToRepoInfo(id: any, type: any) {
-      if(type === "Jira") {
-        this.$router.push({ name: "JiraInfo", params: { repoId: id } });
-      } else {
-        this.$router.push({ name: "RepoInfo", params: { repoId: id } });
-      }
+    async goToScheduleInfo(id: any) {
+      this.$router.push({ name: "ScheduleInfo", params: { scheduleId: id } });
     },
     async add(
-      url: any,
-      isSonarqube: boolean,
-      sonarqubeUrl: string,
-      accountColonPassword: string,
-      projectKey: string
+      title: any,
+      location: string,
+      description: string,
+      isVideoConferencing: boolean
     ) {
-      const result = await addRepo(
+      const result = await createSchedule(
         Number(this.projectId),
-        url,
-        isSonarqube,
-        sonarqubeUrl,
-        accountColonPassword,
-        projectKey
+        title,
+        location,
+        description,
+        isVideoConferencing
       );
       this.msg = result["data"].message;
       this.dialog = false;
       this.snackBar = true;
       this.snackBarColor = result["data"].success ? "green" : "red";
-      await this.getResitories();
+      await this.getSchedules();
     },
     async showSnackBar(success: boolean ) {
       this.msg = success ? "Add success!" : "Add fail!";
       //this.dialog = false;
       this.snackBar = true;
       this.snackBarColor = success ? "green" : "red";
-      await this.getResitories();
+      await this.getSchedules();
     },
-    async getResitories() {
-      this.repositories = (await getRepository(this.projectId))["data"];
+    async getSchedules() {
+      this.schedules = (await getSchedulesInProject(this.projectId))["data"];
     },
-    ChangeInput(searchedRepo: any) {
-      this.search = searchedRepo;
+    ChangeInput(searchedSchedule: any) {
+      this.search = searchedSchedule;
     },
 
-    deleteRepo(repoId: any) {
+    deleteSchedule(scheduleId: any) {
       this.dialogDelete = true;
-      this.wantToDeleteRepoId = repoId;
+      this.wantToDeleteScheduleId = scheduleId;
     },
 
     async deleteConfirm() {
-      const result = await deleteRepo(this.projectId, this.wantToDeleteRepoId);
+      const result = await deleteSchedule(this.wantToDeleteScheduleId);
       this.dialogDelete = false;
-      this.wantToDeleteRepoId = -1;
+      this.wantToDeleteScheduleId = -1;
       this.msg = result["data"].message;
       this.snackBar = true;
       this.snackBarColor = result["data"].success ? "green" : "red";
-      await this.getResitories();
+      await this.getSchedules();
     },
 
     deleteCancel() {
       this.dialogDelete = false;
-      this.wantToDeleteRepoId = -1;
+      this.wantToDeleteScheduleId = -1;
     },
   },
 });

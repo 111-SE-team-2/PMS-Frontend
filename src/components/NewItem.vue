@@ -17,13 +17,13 @@
                 label="Select repository type"
                 :items="['Github', 'Gitlab', 'Sonarqube', 'Jira']"
                 v-model="repoType"
-                v-show="isShow()"
+                v-show="isProject() && isSchedule() && isMeetingMinute()"
               ></v-select>
             </v-col>
           </v-row>
         </v-container>
         <!-- add project form-->
-        <v-container v-show="!isShow()">
+        <v-container v-show="!isProject()">
           <v-row>
             <v-col cols="12">
               <v-text-field
@@ -39,6 +39,83 @@
               Cancel
             </v-btn>
             <v-btn color="blue darken-1" text @click="add"> Add </v-btn>
+          </v-row>
+        </v-container>
+        <!-- add schedule form-->
+        <v-container v-show="!isSchedule() && isScheduleOption()">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                :label="vTextLabel"
+                v-model="title"
+                required
+              ></v-text-field>
+              <v-text-field
+                label="location"
+                v-model="location"
+                required
+              ></v-text-field>
+              <v-text-field
+                label="description"
+                v-model="description"
+                required
+              ></v-text-field>
+              <v-switch
+                label="isVideoConferencing"
+                v-model="isVideoConferencing"
+                required
+              ></v-switch>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Cancel
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="addSchedule"> Add </v-btn>
+          </v-row>
+        </v-container>
+        <!-- add schedule option form-->
+        <v-container v-show="!isScheduleOption()">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                :label="vTextLabel"
+                v-model="startTime"
+                required
+              ></v-text-field>
+              <v-text-field
+                label="duration"
+                v-model="duration"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Cancel
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="addScheduleOption"> Add </v-btn>
+          </v-row>
+        </v-container>
+        <!-- add meeting minute form-->
+        <v-container v-show="!isMeetingMinute()">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                :label="vTextLabel"
+                v-model="title"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Cancel
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="addMeetingMinute"> Add </v-btn>
           </v-row>
         </v-container>
         <!-- github form -->
@@ -202,7 +279,13 @@ export default Vue.extend({
       userAccounts: [] as any,
       repoType: "",
       jiraVerifyState: false,
-      projectId: this.$route.params.projectId
+      projectId: this.$route.params.projectId,
+      title: "",
+      location: "",
+      description: "",
+      isVideoConferencing: false,
+      startTime: "",
+      duration: ""
     };
   },
   watch: {
@@ -240,9 +323,24 @@ export default Vue.extend({
       this.jiraData.URL = "";
       this.jiraData.boardList = [];
       this.jiraVerifyState = false;
+      this.title = "";
+      this.location = "";
+      this.description = "";
+      this.isVideoConferencing = false;
+      this.startTime = "";
+      this.duration = "";
     },
-    isShow() {
+    isProject() {
       return !this.vCardTitle.includes("Project");
+    },
+    isSchedule() {
+      return !this.vCardTitle.includes("Schedule");
+    },
+    isScheduleOption() {
+      return !this.vCardTitle.includes("Schedule Option");
+    },
+    isMeetingMinute() {
+      return !this.vCardTitle.includes("Meeting Minute");
     },
     async verifyAndGetBoardInfo() { 
       const result = await getJiraBoardInfo(
@@ -272,6 +370,31 @@ export default Vue.extend({
       this.$emit(
         "showSnackBar",
         result.data.success
+      );
+      this.dialog = false;
+    },
+    addSchedule(){
+      this.$emit(
+        "add",
+        this.title,
+        this.location,
+        this.description,
+        this.isVideoConferencing
+      );
+      this.dialog = false;
+    },
+    addScheduleOption(){
+      this.$emit(
+        "add",
+        this.startTime,
+        this.duration
+      );
+      this.dialog = false;
+    },
+    addMeetingMinute(){
+      this.$emit(
+        "add",
+        this.title
       );
       this.dialog = false;
     }

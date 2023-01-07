@@ -7,7 +7,7 @@
           <v-col>
             <v-data-table
               :headers="headers"
-              :items="repositories"
+              :items="meetingMinutes"
               :search="search"
               fixed-header
               hide-default-footer
@@ -17,14 +17,14 @@
                 <v-row class="d-flex justify-space-around">
                   <v-col class="pl-5">
                     <TableSearch
-                      vTextLabel="Find a Repo..."
+                      vTextLabel="Find a Meeting Minute..."
                       @ChangeInput="ChangeInput($event)"
                     />
                   </v-col>
                   <v-col class="d-flex justify-end align-end pr-5">
                     <NewItem
-                      vCardTitle="Add Repository"
-                      vTextLabel="Repository URL"
+                      vCardTitle="Add Meeting Minute"
+                      vTextLabel="Meeting Minute Title"
                       @add="add"
                       @showSnackBar="showSnackBar"
                     />
@@ -49,15 +49,15 @@
                   </v-card>
                 </v-dialog>
               </template>
-              <template v-slot:[`item.name`]="{ item }">
-                <img src="../assets/GitHub-Mark-32px.png">
-                <a class="py-2 " @click="goToRepoInfo(item.id, item.type)">
-                  {{ item.name }}
+              <template v-slot:[`item.title`]="{ item }">
+                <img src="../assets/meetingMinute.png">
+                <a class="py-2 " @click="goToMeetingMinuteInfo(item.id)">
+                  {{ item.title }}
                 </a>
               </template>
               <template v-slot:[`item.action`]="{ item }">
                 <div class="d-flex justify-end align-end">
-                  <v-icon @click="deleteRepo(item.id)"> mdi-delete </v-icon>
+                  <v-icon @click="deleteMeetingMinute(item.id)"> mdi-delete </v-icon>
                 </div>
               </template>
             </v-data-table>
@@ -78,9 +78,9 @@
 <script lang="ts">
 import Vue from "vue";
 import router from "@/router";
-import { addRepo, getRepository, deleteRepo } from "@/apis/repository";
 import NewItem from "@/components/NewItem.vue";
 import TableSearch from "@/components/TableSearch.vue";
+import { createMeetingMinute, deleteMeetingMinute, getMeetingMinutesInProject } from "@/apis/meetingMinute";
 
 export default Vue.extend({
   components: {
@@ -92,90 +92,77 @@ export default Vue.extend({
       search: "",
       headers: [
         {
-          text: "RepositoryName",
-          value: "name",
+          text: "Meeting Minute Title",
+          value: "title",
         },
         {
           text: "action",
           value: "action",
         },
       ],
-      repositories: [{ type: Object, id: "", name: "", test: "" }],
+      meetingMinutes: [{ type: Object, id: "", title: "", test: "" }],
       dialog: false,
       projectId: this.$route.params.projectId,
-      url: "",
       msg: "",
       snackBar: false,
       snackBarTimeout: 5000,
       snackBarColor: "",
       dialogDelete: false,
-      wantToDeleteRepoId: -1,
+      wantToDeleteMeetingMinuteId: -1,
     };
   },
   async created() {
-    this.repositories = (await getRepository(this.projectId))["data"];
+    this.meetingMinutes = (await getMeetingMinutesInProject(this.projectId))["data"];
   },
   methods: {
-    async goToRepoInfo(id: any, type: any) {
-      if(type === "Jira") {
-        this.$router.push({ name: "JiraInfo", params: { repoId: id } });
-      } else {
-        this.$router.push({ name: "RepoInfo", params: { repoId: id } });
-      }
+    async goToMeetingMinuteInfo(id: any) {
+      this.$router.push({ name: "MeetingMinuteInfo", params: { meetingMinuteId: id } });
     },
     async add(
-      url: any,
-      isSonarqube: boolean,
-      sonarqubeUrl: string,
-      accountColonPassword: string,
-      projectKey: string
+      title: any,
     ) {
-      const result = await addRepo(
+      const result = await createMeetingMinute(
         Number(this.projectId),
-        url,
-        isSonarqube,
-        sonarqubeUrl,
-        accountColonPassword,
-        projectKey
+        title
       );
       this.msg = result["data"].message;
       this.dialog = false;
       this.snackBar = true;
       this.snackBarColor = result["data"].success ? "green" : "red";
-      await this.getResitories();
+      await this.getMeetingMinutes();
     },
     async showSnackBar(success: boolean ) {
       this.msg = success ? "Add success!" : "Add fail!";
       //this.dialog = false;
       this.snackBar = true;
       this.snackBarColor = success ? "green" : "red";
-      await this.getResitories();
+      await this.getMeetingMinutes();
     },
-    async getResitories() {
-      this.repositories = (await getRepository(this.projectId))["data"];
+    async getMeetingMinutes() {
+      this.meetingMinutes = (await getMeetingMinutesInProject(this.projectId))["data"];
     },
-    ChangeInput(searchedRepo: any) {
-      this.search = searchedRepo;
+    ChangeInput(searchedMeetingMinute: any) {
+      this.search = searchedMeetingMinute;
     },
 
-    deleteRepo(repoId: any) {
+    deleteMeetingMinute(meetingMinuteId: any) {
       this.dialogDelete = true;
-      this.wantToDeleteRepoId = repoId;
+      this.wantToDeleteMeetingMinuteId = meetingMinuteId;
     },
 
     async deleteConfirm() {
-      const result = await deleteRepo(this.projectId, this.wantToDeleteRepoId);
+      const result = await deleteMeetingMinute(this.wantToDeleteMeetingMinuteId);
       this.dialogDelete = false;
-      this.wantToDeleteRepoId = -1;
+      this.wantToDeleteMeetingMinuteId = -1;
       this.msg = result["data"].message;
       this.snackBar = true;
       this.snackBarColor = result["data"].success ? "green" : "red";
-      await this.getResitories();
+      await this.getMeetingMinutes();
     },
 
     deleteCancel() {
       this.dialogDelete = false;
-      this.wantToDeleteRepoId = -1;
+      this.wantToDeleteMeetingMinuteId = -1;
     },
   },
 });

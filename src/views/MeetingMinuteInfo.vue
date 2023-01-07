@@ -1,5 +1,15 @@
 <template>
     <v-container fill-height>
+      <v-row>
+        <v-edit-dialog @save="save" :return-value.sync="meetingMinuteTitle">
+        <div class="text-h4">{{ meetingMinuteTitle }}</div>
+        <template v-slot:input>
+          <v-text-field
+            v-model="meetingMinuteTitle"
+            label="Edit Title"
+          ></v-text-field>
+        </template> </v-edit-dialog>
+      </v-row>
       <v-row class="d-flex justify-center">
         <v-tabs v-model="tab" background-color="transparent" color="basil" @change="save">
           <v-tab><img src="../assets/edit.png"></v-tab>
@@ -9,11 +19,11 @@
 
         <v-tabs-items v-model="tab" class="tab-item">
           <v-tab-item
-            ><v-md-editor v-model="meetingMinuteContent" height="800px" tab-size=4 mode="edit" @save="save"></v-md-editor></v-tab-item>
+            ><v-md-editor v-model="meetingMinuteContent" height="750px" tab-size=4 mode="edit" @save="save"></v-md-editor></v-tab-item>
           <v-tab-item
-            ><v-md-editor v-model="meetingMinuteContent" height="800px" tab-size=4 mode="editable" @save="save"></v-md-editor></v-tab-item>
+            ><v-md-editor v-model="meetingMinuteContent" height="750px" tab-size=4 mode="editable" @save="save"></v-md-editor></v-tab-item>
           <v-tab-item
-            ><v-md-editor v-model="meetingMinuteContent" height="800px" tab-size=4 mode="preview" @save="save"></v-md-editor></v-tab-item>
+            ><v-md-editor v-model="meetingMinuteContent" height="750px" tab-size=4 mode="preview" @save="save"></v-md-editor></v-tab-item>
         </v-tabs-items>
       </v-row>
       <v-snackbar

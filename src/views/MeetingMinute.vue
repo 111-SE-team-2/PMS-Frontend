@@ -123,7 +123,8 @@ export default Vue.extend({
     ) {
       const result = await createMeetingMinute(
         Number(this.projectId),
-        title
+        title,
+        " "
       );
       this.msg = result["data"].message;
       this.dialog = false;

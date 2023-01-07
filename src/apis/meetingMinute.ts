@@ -12,13 +12,15 @@ export const getMeetingMinutesInProject: any = (projectId: string) => {
 
 export const createMeetingMinute: any = (
   projectId: number,
-  title: string
+  title: string,
+  content: string
 ) => {
   return axios.post(
     `${host}/meetingMinute/create`,
     {
       projectId: projectId,
-      title: title
+      title: title,
+      content: content
     },
     {
       headers: {
